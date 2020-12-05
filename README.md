@@ -2,4 +2,4 @@
 SuperCollider Wii Guitare héro. 
 With OSCulator app.
 
-Need a Wii + Guitare controler.
+Need a Wii + Guitare controler + OSCulator.
