@@ -1,4 +1,5 @@
 (
+(
 /*
 
 
@@ -25,7 +26,7 @@ J:::::::JJJ:::::::Jo:::::ooooo:::::oh:::::h     h:::::h n::::n    n::::n  n::::n
                                                                                          yyyyyyy
 
 
-Johnny V1.6: -- 20.11.2020.
+Johnny V1.6: -- 12.12.2020.
 
 Added:
 
@@ -34,12 +35,12 @@ Listen port forced to 57120.
 
 TODO:
 
--Mettre à jour Max...
--MouseBouton.kr => Wii Mapping.
 -Add Prevent bad audio routing => default MacBoock.
 -Add s.meter.alwaysOnTop_(true);
 -C'est quoi la commande pour allumer le BT automatiquement?
 - x = Synth... Globals variables change.
+
+- Make a warnig if no soundfiles.
 
 FIXME:
 
@@ -54,7 +55,7 @@ FIXME:
 		//Globals variables.
 		var switch, fadeTime, hero, feedEnd, seq, seq2,
 		sounds, guitare_seqDown, guitare_seqUp, relative_path,
-		osculator_path, folder, osc_out, btn_clbck, sampler_sounds;
+		osculator_path, qlab_path, folder, osc_out, btn_clbck, sampler_sounds;
 
 		//Control Bus.
 		var pitch = Bus.control(s, 1);
@@ -90,10 +91,13 @@ FIXME:
 		osculator_path = relative_path+/+"johnny_osc.osc3";
 		osculator_path.openOS;
 
+		qlab_path = relative_path+/+"JohnnyQlab.qlab4";
+		qlab_path.openOS;
+
 		folder = PathName(relative_path+/+"soundfiles");
 		folder.entries.do({ |path|
 			sounds = sounds.add(Buffer.read(s, path.fullPath));
-		});
+		});Ks
 
 		btn_clbck = { |nb=2|
 			Routine({
@@ -104,7 +108,7 @@ FIXME:
 			}).play;
 		};
 
-		SynthDef(\hardRock, { |out, gate=1, pan=0, freq=300, amp=0.1, noiselevel=0.2,
+		SynthDef(\hardRock, { |out, gate=1, pan=0, freq=300, amp=0.07, noiselevel=0.2,
 			minfreq=100, decaytime=1, doneAction=2, ffreq=500, rq=0.3, spread=0.8|
 			var sig, env;
 			sig = WhiteNoise.ar(noiselevel);
@@ -158,15 +162,15 @@ FIXME:
 			freqs = freqs * whammy.kr.linlin(0, 0.5, 1, 0.75).lag(4);
 			sig = CombN.ar(sig ! 6,1 / minfreqs, 1 / freqs, 8).mean;
 			sig = LPF.ar(sig, 8000);
-			sig = HPF.ar(sig * pitch.kr.linlin(0, 1, 0, 5).varlag(0.05), 80);
-			sig = RLPFD.ar(sig, accel.kr.linlin(0.2, 0.55, 600, 10000).lag(0.2) * [1, 1.1], 0.1, 0.5);
+			sig = HPF.ar(sig * pitch.kr.linlin(0, 1, 0, 7).varlag(0.05), 80);
+			sig = RLPFD.ar(sig, accel.kr.linexp(0.2, 0.55, 600, 10000).lag(0.2) * [1, 1.1], 0.1, 0.5);
 			sig = sig + sig.mean;
 			dry = sig;
 			10.do {
 				d = 0.2.rand;
 				sig = AllpassN.ar(sig, d, d, 5);
 			};
-			(dry + sig) * 0.15;
+			(dry + sig) * 0.25;
 		}).add;
 
 		s.sync;
@@ -183,12 +187,12 @@ FIXME:
 			\minfreq, 50,
 			\decaytime, 1.0,
 			\adsr, Pseq([
-				[Env.adsr(0.02,0.1,0.8,0.4,curve:0.5)],
-				[Env.adsr(0.02,0.1,0.8,0.4,curve:0.5)],
-				[Env.adsr(0.02,0.1,0.8,0.4,curve:0.5)],
+				[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
+				[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
+				[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
 				[Env.adsr(0.03,0.1,0.8,0.6,curve:0.7)],
-				[Env.adsr(0.03,0.1,0.8,0.6,curve:0.7)],
-				[Env.adsr(0.03,0.1,0.8,0.6,curve:0.7)],
+				[Env.adsr(0.03,0.1,0.8,0.8,curve:0.7)],
+				[Env.adsr(0.03,0.1,0.8,0.10,curve:0.7)],
 			],inf),
 			\legato, 1.0,
 			\ffreq, [500,610,820,140],
@@ -205,12 +209,12 @@ FIXME:
 			\minfreq, 50,
 			\decaytime, 1.0,
 			\adsr, Pseq([
-				[Env.adsr(0.02,0.1,0.8,0.4,curve:0.5)],
-				[Env.adsr(0.02,0.1,0.8,0.4,curve:0.5)],
-				[Env.adsr(0.02,0.1,0.8,0.4,curve:0.5)],
-				[Env.adsr(0.03,0.1,0.8,0.6,curve:0.7)],
-				[Env.adsr(0.03,0.1,0.8,0.6,curve:0.7)],
-				[Env.adsr(0.03,0.1,0.8,0.6,curve:0.7)],
+				[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
+				[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
+				[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
+				[Env.adsr(0.03,0.1,0.8,0.8,curve:0.7)],
+				[Env.adsr(0.03,0.1,0.8,0.8,curve:0.7)],
+				[Env.adsr(0.03,0.1,0.8,0.10,curve:0.7)],
 			],inf),
 			\legato, 1.0,
 			\ffreq, [500,610,820,140],
@@ -256,14 +260,14 @@ FIXME:
 
 		OSCdef(\one_shot_sample, { |msg|
 			if (msg[1] == 1 && (sampler_sounds.isPlaying.not), {
-				sampler_sounds = Synth(\player_mono, [\buf, sounds[0], \amp, 0.9, \pan, 0.0]).register;
+				sampler_sounds = Synth(\player_mono, [\buf, sounds[0], \amp, 1, \pan, 0.0]).register;
 			});
 		}, "/b1"
 		);
 
 		OSCdef(\feedEnd, { |msg|
 			if (msg[1] == 1 && (u.isPlaying.not), {
-				u = Synth(\feedEnd, [\amp, 0.4]).register;
+				u = Synth(\feedEnd, [\amp, 0.25]).register;
 			});
 		}, "/k4"
 		);
