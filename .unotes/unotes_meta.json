@@ -1,0 +1,16 @@
+{
+  "name": "",
+  "isOrdered": true,
+  "folders": {
+    "soundfiles": {
+      "name": "soundfiles",
+      "isOrdered": true,
+      "folders": {},
+      "files": {}
+    }
+  },
+  "files": {
+    "README": 0,
+    "Fiche_Technique": 1
+  }
+}
