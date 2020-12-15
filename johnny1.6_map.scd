@@ -1,5 +1,4 @@
 (
-(
 /*
 
 
@@ -26,7 +25,7 @@ J:::::::JJJ:::::::Jo:::::ooooo:::::oh:::::h     h:::::h n::::n    n::::n  n::::n
                                                                                          yyyyyyy
 
 
-Johnny V1.6: -- 12.12.2020.
+Johnny V2: -- 14.12.2020. RESIDENCE.
 
 Added:
 
@@ -36,8 +35,11 @@ Listen port forced to 57120.
 TODO:
 
 -Add Prevent bad audio routing => default MacBoock.
+
+-Volume control... Master.
+
 -Add s.meter.alwaysOnTop_(true);
--C'est quoi la commande pour allumer le BT automatiquement?
+
 - x = Synth... Globals variables change.
 
 - Make a warnig if no soundfiles.
@@ -54,7 +56,7 @@ FIXME:
 
 		//Globals variables.
 		var switch, fadeTime, hero, feedEnd, seq, seq2,
-		sounds, guitare_seqDown, guitare_seqUp, relative_path,
+		sounds, guitare_seqDown, guitare_seqUp, relative_path, cater,
 		osculator_path, qlab_path, folder, osc_out, btn_clbck, sampler_sounds;
 
 		//Control Bus.
@@ -97,7 +99,7 @@ FIXME:
 		folder = PathName(relative_path+/+"soundfiles");
 		folder.entries.do({ |path|
 			sounds = sounds.add(Buffer.read(s, path.fullPath));
-		});Ks
+		});
 
 		btn_clbck = { |nb=2|
 			Routine({
@@ -107,6 +109,14 @@ FIXME:
 				};
 			}).play;
 		};
+
+		SynthDef(\caterpilard, { |amp=0.5, gate=1, out|
+			var sig, car, env;
+			env = EnvGen.kr(Env.asr(7, 1, 7), gate, doneAction:2);
+			sig = SinOsc.ar([25, 30] + SinOsc.ar(65, mul: 35), mul:amp);
+			sig = sig * env * amp;
+			Out.ar(out, Splay.ar(sig, center: SinOsc.kr(0.05).range(-1, 1)));
+		}).add;
 
 		SynthDef(\hardRock, { |out, gate=1, pan=0, freq=300, amp=0.07, noiselevel=0.2,
 			minfreq=100, decaytime=1, doneAction=2, ffreq=500, rq=0.3, spread=0.8|
@@ -170,7 +180,7 @@ FIXME:
 				d = 0.2.rand;
 				sig = AllpassN.ar(sig, d, d, 5);
 			};
-			(dry + sig) * 0.25;
+			(dry + sig) * 0.1;
 		}).add;
 
 		s.sync;
@@ -312,7 +322,18 @@ FIXME:
 		OSCFunc.new({ |msg| //accel
 			ffreq.value(msg[4], msg[4])
 		}, '/pry'
-		)
+		);
+
+		OSCdef(\caterP, {|msg|
+			if(msg[1] == 1 && (cater.isPlaying.not), {
+			cater = Synth(\caterpilard, [\amp, 0.5]).register;
+			});
+
+			if (msg[1] == 1 && (cater.isPlaying), {
+				cater.release(5);
+			});
+		}, "/cater"
+		);
 	};
 
 }.fork
