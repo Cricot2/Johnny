@@ -25,26 +25,13 @@ J:::::::JJJ:::::::Jo:::::ooooo:::::oh:::::h     h:::::h n::::n    n::::n  n::::n
                                                                                          yyyyyyy
 
 
-Johnny V2: -- 14.12.2020. RESIDENCE.
-
-Added:
-
-MAPP OSC
+Johnny V2.1: -- 23.12.2020.  Big improvement in SeqUp / seqDown.
 Listen port forced to 57120.
 
 TODO:
 
--Add Prevent bad audio routing => default MacBoock.
-
--Add s.meter.alwaysOnTop_(true);
-
+- Seq up better pattern...
 - x = Synth... Globals variables change.
-
-- Make a warnig if no soundfiles.
-
-FIXME:
-
--Random trigger \hardRock Synth...
 
 */
 
@@ -195,73 +182,67 @@ FIXME:
 		//init.
 		switch = 0;
 		hero.fadeTime = 5;
+		seq = Pseq(#[48, 52, 40], inf).asStream;
+		seq2 = Pseq(#[50, 53, 55, 57, 60, 64]-12, inf).asStream;
 
-		//Pbind to control \hardRock synth and play next note with string button.
-		seq = Pbind(\x, Pseq([1, 2, 3], inf),
-			\instrument, \hardRock,
-			\midinote, Pseq([48, 52, 40], inf),
-			\octave, Pstep(Pseq([3,4],inf),Pseq([5,0.75],inf)),
-			\minfreq, 50,
-			\decaytime, 1.0,
-			\adsr, Pseq([
-				[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
-				[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
-				[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
-				[Env.adsr(0.03,0.1,0.8,0.6,curve:0.7)],
-				[Env.adsr(0.03,0.1,0.8,0.8,curve:0.7)],
-				[Env.adsr(0.03,0.1,0.8,0.10,curve:0.7)],
-			],inf),
-			\legato, 1.0,
-			\ffreq, [500,610,820,140],
-			\ffreqtab, [ 6, 4, 5, 10, 1, 1.2, 0.8, 1.1, 2, 8],
-			\dur, Pseq([4],inf),
-			\spread, 0.5,
-			\amp, 1.6
-		).play;
+		OSCdef(\guitare_melodieDown, { |msg|
+			if (msg[1] == 1, {
+				Routine({
+					var pbind = Pbind(\instrument, \hardRock,
+						\midinote, seq.next,
+						\octave, Pstep(Pseq([3,4],inf),Pseq([5,0.75],inf)),
+						\minfreq, 50,
+						\decaytime, 1.0,
+						\adsr, Pseq([
+							[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
+							[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
+							[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
+							[Env.adsr(0.03,0.1,0.8,0.6,curve:0.7)],
+							[Env.adsr(0.03,0.1,0.8,0.8,curve:0.7)],
+							[Env.adsr(0.03,0.1,0.8,0.10,curve:0.7)],
+						],inf),
+						\legato, 1.0,
+						\ffreq, [500,610,820,140],
+						\ffreqtab, [ 6, 4, 5, 10, 1, 1.2, 0.8, 1.1, 2, 8],
+						\dur, Pseq([4],inf),
+						\spread, 0.5,
+						\amp, 1.6
+					).play;
+					0.1.wait; pbind.stop;
+				}).play;
+			});
+		}, "/stringDown"
+		);
 
-		seq2 = Pbind(\y, Pseq([1, 2, 3], inf),
-			\instrument, \hardRock,
-			\midinote, Pseq([50, 53, 55, 57, 60, 64]-12, inf),
-			\octave, Pstep(Pseq([3,4],inf),Pseq([5,0.75],inf)),
-			\minfreq, 50,
-			\decaytime, 1.0,
-			\adsr, Pseq([
-				[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
-				[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
-				[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
-				[Env.adsr(0.03,0.1,0.8,0.8,curve:0.7)],
-				[Env.adsr(0.03,0.1,0.8,0.8,curve:0.7)],
-				[Env.adsr(0.03,0.1,0.8,0.10,curve:0.7)],
-			],inf),
-			\legato, 1.0,
-			\ffreq, [500,610,820,140],
-			\ffreqtab, [ 6, 4, 5, 10, 1, 1.2, 0.8, 1.1, 2, 8],
-			\dur, Pseq([3,1,1, 0.25,0.25,0.25]+1.5,inf),
-			\spread, 0.5,
-			\amp, 1.6
-		).play;
+		OSCdef(\guitare_melodieUp, { |msg|
+			if (msg[1] == 1, {
+				Routine({
+					var pbind = Pbind(\instrument, \hardRock,
+						\midinote, seq2.next,
+						\octave, Pstep(Pseq([3,4],inf),Pseq([5,0.75],inf)),
+						\minfreq, 50,
+						\decaytime, 1.0,
+						\adsr, Pseq([
+							[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
+							[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
+							[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
+							[Env.adsr(0.03,0.1,0.8,0.6,curve:0.7)],
+							[Env.adsr(0.03,0.1,0.8,0.8,curve:0.7)],
+							[Env.adsr(0.03,0.1,0.8,0.10,curve:0.7)],
+						],inf),
+						\legato, 1.0,
+						\ffreq, [500,610,820,140],
+						\ffreqtab, [ 6, 4, 5, 10, 1, 1.2, 0.8, 1.1, 2, 8],
+						\dur, Pseq([4],inf),
+						\spread, 0.5,
+						\amp, 1.6
+					).play;
+					0.1.wait; pbind.stop;
+				}).play;
+			});
+		}, "/stringUp"
+		);
 
-		guitare_seqDown = Routine({ var b;
-			b = seq.asStream;
-			b.play;
-			0.1.wait;
-			b.stop;
-			b.next;
-		});
-
-		guitare_seqDown.play.reset;
-
-		guitare_seqUp = Routine({ var c;
-			c = seq2.asStream;
-			c.play;
-			0.1.wait;
-			c.stop;
-			c.next;
-		});
-
-		guitare_seqUp.play.reset;
-
-		//OSC MAP.
 		OSCdef(\guitare_feedback_switch, { |msg|
 			var synth;
 			case
@@ -298,27 +279,6 @@ FIXME:
 		}, "/k4"
 		);
 
-		OSCdef(\guitare_melodieDown, { |msg|
-			if (msg[1] == 1, {
-				btn_clbck.value(1);
-				guitare_seqDown.play; guitare_seqDown.reset;
-			});
-		}, "/stringDown"  // '/string' pour wii guitare.
-		);
-
-		OSCdef(\guitare_melodieUp, { |msg|
-			if (msg[1] == 1, {
-				btn_clbck.value(1);
-				guitare_seqUp.play; guitare_seqUp.reset;
-			});
-		}, "/stringUp"  // '/string' pour wii guitare.
-		);
-
-		OSCdef(\Qlab, { |msg| //test Qlab => OSC => SC.
-			if (msg[1] == 1, {"Qlab".postln});
-		}, "/tracto"
-		);
-
 		OSCdef(\k3, { |msg|
 			if (msg[1] == 1 && (moto.isPlaying.not), {
 				moto = Synth(\player_mono, [\buf, sounds[4], \amp, 1.5]).register
@@ -328,22 +288,6 @@ FIXME:
 				moto2 = Synth(\player_mono, [\buf, sounds[3], \amp, 1.5]).register
 			});
 		}, "/k3"
-		);
-
-		//OSCFunc for ControlBus.
-		OSCFunc.new({ |msg| //whammy
-			freqs.value(msg[1], msg[1])
-		}, '/whammy'
-		);
-
-		OSCFunc.new({ |msg| //picth
-			setSynthFreq.value(msg[1], msg[1])
-		}, '/pry'
-		);
-
-		OSCFunc.new({ |msg| //accel
-			ffreq.value(msg[4], msg[4])
-		}, '/pry'
 		);
 
 		OSCdef(\caterP, {|msg|
@@ -356,6 +300,18 @@ FIXME:
 			});
 		}, "/cater"
 		);
+
+		//OSCFunc for ControlBus.
+		OSCFunc.new( { |msg| freqs.value(msg[1], msg[1]) },'/whammy');
+
+		OSCFunc.new( { |msg| setSynthFreq.value(msg[1], msg[1]) }, '/pry');
+
+		OSCFunc.new( { |msg| ffreq.value(msg[4], msg[4]) }, '/pry');
+
+		//test Qlab => SC.
+		OSCdef(\Qlab, { |msg| if (msg[1] == 1, {"Qlab".postln}) }, "/tracto");
+
+
 	};
 
 }.fork
