@@ -25,22 +25,17 @@ J:::::::JJJ:::::::Jo:::::ooooo:::::oh:::::h     h:::::h n::::n    n::::n  n::::n
                                                                                          yyyyyyy
 
 
-Johnny V2.1: -- 23.12.2020.  Big improvement in SeqUp / seqDown.
+Johnny V2.2: -- 22.01.2021.
 Listen port forced to 57120.
-
-TODO:
-
-- Seq up better pattern...
-- x = Synth... Globals variables change.
 
 */
 
 
 {
 	//Init audio setup and reboot.
-	unixCmd("killall scsynth");
+	/*unixCmd("killall scsynth");
 	Server.default.options.inDevice_("Micro MacBook Pro");
-	Server.default.options.outDevice_("Ecouteurs externes");
+	Server.default.options.outDevice_("Ecouteurs externes");*/
 	s.options.sampleRate = 48000;
 
 	s.waitForBoot{
@@ -86,9 +81,6 @@ TODO:
 
 		osculator_path = relative_path+/+"johnny_osc.osc3";
 		osculator_path.openOS;
-
-		qlab_path = relative_path+/+"JohnnyQlab.qlab4";
-		qlab_path.openOS;
 
 		folder = PathName(relative_path+/+"soundfiles");
 		folder.entries.do({ |path|
@@ -183,7 +175,7 @@ TODO:
 		switch = 0;
 		hero.fadeTime = 5;
 		seq = Pseq(#[48, 52, 40], inf).asStream;
-		seq2 = Pseq(#[50, 53, 55, 57, 60, 64]-12, inf).asStream;
+		seq2 = Pseq(#[43, 43, 39, 38], inf).asStream;
 
 		OSCdef(\guitare_melodieDown, { |msg|
 			if (msg[1] == 1, {
@@ -235,7 +227,7 @@ TODO:
 						\ffreqtab, [ 6, 4, 5, 10, 1, 1.2, 0.8, 1.1, 2, 8],
 						\dur, Pseq([4],inf),
 						\spread, 0.5,
-						\amp, 1.6
+						\amp, 0
 					).play;
 					0.1.wait; pbind.stop;
 				}).play;
@@ -311,8 +303,8 @@ TODO:
 		//test Qlab => SC.
 		OSCdef(\Qlab, { |msg| if (msg[1] == 1, {"Qlab".postln}) }, "/tracto");
 
-
 	};
 
 }.fork
 )
+
