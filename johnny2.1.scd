@@ -25,7 +25,7 @@ J:::::::JJJ:::::::Jo:::::ooooo:::::oh:::::h     h:::::h n::::n    n::::n  n::::n
                                                                                          yyyyyyy
 
 
-Johnny V2.2: -- 22.01.2021.
+Johnny V2.2: -- 28.01.2021.
 Listen port forced to 57120.
 
 */
@@ -227,7 +227,7 @@ Listen port forced to 57120.
 						\ffreqtab, [ 6, 4, 5, 10, 1, 1.2, 0.8, 1.1, 2, 8],
 						\dur, Pseq([4],inf),
 						\spread, 0.5,
-						\amp, 0
+						\amp, 0.7
 					).play;
 					0.1.wait; pbind.stop;
 				}).play;
