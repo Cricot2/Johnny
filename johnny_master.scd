@@ -1,6 +1,30 @@
 (
 /*
 
+
+          JJJJJJJJJJJ              hhhhhhh
+          J:::::::::J              h:::::h
+          J:::::::::J              h:::::h
+          JJ:::::::JJ              h:::::h
+            J:::::J   ooooooooooo   h::::h hhhhh      nnnn  nnnnnnnn    nnnn  nnnnnnnn yyyyyyy           yyyyyyy
+            J:::::J oo:::::::::::oo h::::hh:::::hhh   n:::nn::::::::nn  n:::nn::::::::nny:::::y         y:::::y
+            J:::::Jo:::::::::::::::oh::::::::::::::hh n::::::::::::::nn n::::::::::::::nny:::::y       y:::::y
+            J:::::jo:::::ooooo:::::oh:::::::hhh::::::hnn:::::::::::::::nnn:::::::::::::::ny:::::y     y:::::y
+            J:::::Jo::::o     o::::oh::::::h   h::::::h n:::::nnnn:::::n  n:::::nnnn:::::n y:::::y   y:::::y
+JJJJJJJ     J:::::Jo::::o     o::::oh:::::h     h:::::h n::::n    n::::n  n::::n    n::::n  y:::::y y:::::y
+J:::::J     J:::::Jo::::o     o::::oh:::::h     h:::::h n::::n    n::::n  n::::n    n::::n   y:::::y:::::y
+J::::::J   J::::::Jo::::o     o::::oh:::::h     h:::::h n::::n    n::::n  n::::n    n::::n    y:::::::::y
+J:::::::JJJ:::::::Jo:::::ooooo:::::oh:::::h     h:::::h n::::n    n::::n  n::::n    n::::n     y:::::::y
+ JJ:::::::::::::JJ o:::::::::::::::oh:::::h     h:::::h n::::n    n::::n  n::::n    n::::n      y:::::y
+   JJ:::::::::JJ    oo:::::::::::oo h:::::h     h:::::h n::::n    n::::n  n::::n    n::::n     y:::::y
+     JJJJJJJJJ        ooooooooooo   hhhhhhh     hhhhhhh nnnnnn    nnnnnn  nnnnnn    nnnnnn    y:::::y
+                                                                                             y:::::y
+                                                                                            y:::::y
+                                                                                           y:::::y
+                                                                                          y:::::y
+                                                                                         yyyyyyy
+
+
 Johnny V2.2: -- 28.01.2021.
 Listen port forced to 57120.
 
