@@ -2,41 +2,25 @@
 /*
 
 
-          JJJJJJJJJJJ              hhhhhhh
-          J:::::::::J              h:::::h
-          J:::::::::J              h:::::h
-          JJ:::::::JJ              h:::::h
-            J:::::J   ooooooooooo   h::::h hhhhh      nnnn  nnnnnnnn    nnnn  nnnnnnnn yyyyyyy           yyyyyyy
-            J:::::J oo:::::::::::oo h::::hh:::::hhh   n:::nn::::::::nn  n:::nn::::::::nny:::::y         y:::::y
-            J:::::Jo:::::::::::::::oh::::::::::::::hh n::::::::::::::nn n::::::::::::::nny:::::y       y:::::y
-            J:::::jo:::::ooooo:::::oh:::::::hhh::::::hnn:::::::::::::::nnn:::::::::::::::ny:::::y     y:::::y
-            J:::::Jo::::o     o::::oh::::::h   h::::::h n:::::nnnn:::::n  n:::::nnnn:::::n y:::::y   y:::::y
-JJJJJJJ     J:::::Jo::::o     o::::oh:::::h     h:::::h n::::n    n::::n  n::::n    n::::n  y:::::y y:::::y
-J:::::J     J:::::Jo::::o     o::::oh:::::h     h:::::h n::::n    n::::n  n::::n    n::::n   y:::::y:::::y
-J::::::J   J::::::Jo::::o     o::::oh:::::h     h:::::h n::::n    n::::n  n::::n    n::::n    y:::::::::y
-J:::::::JJJ:::::::Jo:::::ooooo:::::oh:::::h     h:::::h n::::n    n::::n  n::::n    n::::n     y:::::::y
- JJ:::::::::::::JJ o:::::::::::::::oh:::::h     h:::::h n::::n    n::::n  n::::n    n::::n      y:::::y
-   JJ:::::::::JJ    oo:::::::::::oo h:::::h     h:::::h n::::n    n::::n  n::::n    n::::n     y:::::y
-     JJJJJJJJJ        ooooooooooo   hhhhhhh     hhhhhhh nnnnnn    nnnnnn  nnnnnn    nnnnnn    y:::::y
-                                                                                             y:::::y
-                                                                                            y:::::y
-                                                                                           y:::::y
-                                                                                          y:::::y
-                                                                                         yyyyyyy
+/////////////////////////////////
+// Johnny V2.3: -- 05.08.2021. //
+/////////////////////////////////
 
-
-Johnny V2.2: -- 28.01.2021.
 Listen port forced to 57120.
+
+NEW : Change the Guitare logic for "Que je t'aime".
+
+NOTE:
+
+Le tune va de 0.9 a 1.1.
+1 est l'accordage de base.
+
+En cliquant sur la fenetre Tune et en appuyant sur Alt + up/donw tu as un fine range...
 
 */
 
 
 {
-	//Init audio setup and reboot.
-	/*unixCmd("killall scsynth");
-	Server.default.options.inDevice_("Micro MacBook Pro");
-	Server.default.options.outDevice_("Ecouteurs externes");*/
-	s.options.sampleRate = 48000;
 
 	s.waitForBoot{
 
@@ -44,6 +28,9 @@ Listen port forced to 57120.
 		var switch, fadeTime, hero, feedEnd, seq, seq2, moto, moto2,
 		sounds, guitare_seqDown, guitare_seqUp, relative_path, cater,
 		osculator_path, qlab_path, folder, osc_out, btn_clbck, sampler_sounds, sampler_sounds_loop;
+
+		var guitarNotes, synthGuitare, guit, fineTune;
+		var tunWindow, potTune;
 
 		//Control Bus.
 		var pitch = Bus.control(s, 1);
@@ -72,10 +59,28 @@ Listen port forced to 57120.
 			osc_out = NetAddr("127.0.0.1", 8000);
 		}.value;
 
-		//somes GUI.
+		// GUI General.
 		var wind = Window.closeAll;
 		var volume = s.volume.gui.window.alwaysOnTop_(true);
 		s.meter.window.alwaysOnTop_(true);
+
+		// GUI tune pot.
+		tunWindow = Window("Tune", Rect(1234, 200, 150, 150), resizable: false)
+		.front.alwaysOnTop_(true);
+
+		potTune = Knob(tunWindow, Rect(15, 10, 120, 120))
+		.value_(0.5)
+		.mode_(\vert)
+		.centered_(true)
+		.action_({
+			|obj|
+			var tune;
+			tune = obj.value.linlin(0.0, 1.0, 0.9, 1.1).postln;
+			fineTune = tune;
+		});
+
+		// Init the fine tune for guitare_melodieUp.
+		fineTune = 1;
 
 		//Initialise root folder directorie for soundfiles and open apps.
 		sounds = Array.new;
@@ -99,6 +104,22 @@ Listen port forced to 57120.
 				};
 			}).play;
 		};
+
+		// SynthDefs.
+		SynthDef(\player_tuned, { |pan=0, amp=0.5, buf, rate=1, loop=0, gate=0, rel=1|
+			var sig, mix, env;
+			env = EnvGen.kr(Env.asr(0.01, 1, rel), gate, doneAction:2);
+			sig = PlayBuf.ar(buf.numChannels, buf, BufRateScale.kr(buf) * rate, loop: loop, doneAction:2);
+			sig  = sig * env;
+
+			if (buf.numChannels == 1, {
+				sig = Pan2.ar(sig, pos: pan, level: amp.lag(0.05));
+			}, {
+				sig = Splay.ar(sig, level: amp.lag(0.05), center: pan);
+			});
+
+			Out.ar(0, Pan2.ar(sig, pan, amp));
+		}).add;
 
 		SynthDef(\caterpilard, { |amp=0.5, gate=1, out|
 			var sig, car, env;
@@ -178,8 +199,10 @@ Listen port forced to 57120.
 		//init.
 		switch = 0;
 		hero.fadeTime = 5;
-		seq = Pseq(#[48, 52, 40], inf).asStream;
-		seq2 = Pseq(#[43, 43, 39, 38], inf).asStream;
+		seq = Pseq(#[48, 52, 40], inf).asStream; // ICI NOTES Guitare DOWN.
+
+		guitarNotes = 0;
+		synthGuitare = [];
 
 		OSCdef(\guitare_melodieDown, { |msg|
 			if (msg[1] == 1, {
@@ -212,36 +235,68 @@ Listen port forced to 57120.
 
 		OSCdef(\guitare_melodieUp, { |msg|
 			if (msg[1] == 1, {
-				Routine({
-					var pbind = Pbind(\instrument, \hardRock,
-						\midinote, seq2.next,
-						\octave, Pstep(Pseq([3,4],inf),Pseq([5,0.75],inf)),
-						\minfreq, 50,
-						\decaytime, 1.0,
-						\adsr, Pseq([
-							[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
-							[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
-							[Env.adsr(0.02,0.1,0.8,0.6,curve:0.5)],
-							[Env.adsr(0.03,0.1,0.8,0.6,curve:0.7)],
-							[Env.adsr(0.03,0.1,0.8,0.8,curve:0.7)],
-							[Env.adsr(0.03,0.1,0.8,0.10,curve:0.7)],
-						],inf),
-						\legato, 1.0,
-						\ffreq, [500,610,820,140],
-						\ffreqtab, [ 6, 4, 5, 10, 1, 1.2, 0.8, 1.1, 2, 8],
-						\dur, Pseq([4],inf),
-						\spread, 0.5,
-						\amp, 0.7
-					).play;
-					0.1.wait; pbind.stop;
-				}).play;
+
+				case
+
+				{ guitarNotes == 0 && synthGuitare.isPlaying.not} {
+
+					while({synthGuitare.size > 0}, {
+						synthGuitare.[0].release(0.5);
+						synthGuitare.removeAt(0);
+					});
+
+					synthGuitare = synthGuitare.add(Synth(
+						\player_tuned, [\buf, sounds[5], \gate, 1, \rate, fineTune]).register);
+					guitarNotes = guitarNotes + 1;
+				}
+
+				{ guitarNotes == 1 } {
+
+					while({synthGuitare.size > 0}, {
+						synthGuitare.[0].release(0.5);
+						synthGuitare.removeAt(0);
+					});
+
+					synthGuitare = synthGuitare.add(Synth(
+						\player_tuned, [\buf, sounds[5], \gate, 1, \rate, fineTune]).register);
+					guitarNotes = guitarNotes + 1;
+				}
+
+				{ guitarNotes == 2 } {
+
+					while({synthGuitare.size > 0}, {
+						synthGuitare.[0].release(0.5);
+						synthGuitare.removeAt(0);
+					});
+
+					synthGuitare = synthGuitare.add(Synth(
+						\player_tuned, [\buf, sounds[6], \gate, 1, \rate, fineTune]).register);
+					guitarNotes = guitarNotes + 1;
+				}
+
+				{ guitarNotes == 3 } {
+
+					while({synthGuitare.size > 0}, {
+						synthGuitare.[0].release(0.5);
+						synthGuitare.removeAt(0);
+					});
+
+					synthGuitare = synthGuitare.add(Synth(
+						\player_tuned, [\buf, sounds[7], \gate, 1, \rate, fineTune]).register);
+					guitarNotes = 0;
+				}
+
 			});
+
 		}, "/stringUp"
 		);
 
+
 		OSCdef(\guitare_feedback_switch, { |msg|
 			var synth;
+
 			case
+
 			{msg[1] == 1 && hero.isPlaying && (switch == 0)} {hero.play; switch = 1; btn_clbck.value(1)}
 			{msg[1] == 1 && hero.isPlaying.not && (switch == 1 && (e.isPlaying.not))} {hero.play; btn_clbck.value(1)}
 			{msg[1] == 1 && hero.isPlaying && (switch == 1 && (e.isPlaying.not))} {
@@ -261,7 +316,8 @@ Listen port forced to 57120.
 
 		OSCdef(\one_shot_sampleBeep, { |msg|
 			if (msg[1] == 1 && (sampler_sounds_loop.isPlaying.not), {
-				sampler_sounds_loop = Synth(\player_mono, [\buf, sounds[2], \amp, 1.5, \pan, 0.0, \loop, 1]).register;
+				sampler_sounds_loop = Synth(
+					\player_mono, [\buf, sounds[2], \amp, 1.5, \pan, 0.0, \loop, 1]).register;
 			});
 
 			if (msg[1] == 0 && (sampler_sounds_loop.isPlaying), {sampler_sounds_loop.free});
@@ -288,7 +344,7 @@ Listen port forced to 57120.
 
 		OSCdef(\caterP, {|msg|
 			if(msg[1] == 1 && (cater.isPlaying.not), {
-			cater = Synth(\caterpilard, [\amp, 0.5]).register;
+				cater = Synth(\caterpilard, [\amp, 0.5]).register;
 			});
 
 			if (msg[1] == 1 && (cater.isPlaying), {
@@ -310,15 +366,15 @@ Listen port forced to 57120.
 				OSCdef(\guitare_melodieUp).disable;
 				"Locked".postln;
 			});
+
 			if (msg[1] == 0, {
 				OSCdef(\guitare_melodieUp).enable;
 				"Unloked".postln;
 			});
-			}, "/lock"
-			);
+		}, "/lock"
+		);
 
 	};
 
 }.fork
 )
-
