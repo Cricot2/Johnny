@@ -30,7 +30,7 @@ Quand tu relance le script (genre avant de jouer pour faire ta mise) tu efface l
 
 > Soit tu fais ta mise en faisant dérouler les notes de 'Que je t'aime' et tu Lock la commande avant de jouer, sans relancer le script.
 
-> Soit tu peux ''hard coder" la valeur de l'accordage **ligne 13**:
+> Soit tu peux ''hard coder" la valeur de l'accordage **ligne 83**:
 
 ```smalltalk
 // Init the fine tune for guitare_melodieUp.
