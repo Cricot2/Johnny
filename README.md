@@ -46,6 +46,6 @@ Par exemple tu peux faire:
 fineTune = 0.9;
 ```
 
-Le range de l'accordage va de 0.99 à 1.1 ce qui fait déjà pas mal de marge à l'oreille. Les valeurs du potard s'affichent dans la postwindow.
+Le range de l'accordage va de 0.9 à 1.1 ce qui fait déjà pas mal de marge à l'oreille. Les valeurs du potard s'affichent dans la postwindow.
 
 
