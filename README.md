@@ -16,7 +16,7 @@ J'ai rajouté un potard Tune pour l'accordage de 'Que je t'aime'.
 
 J'ai changé les envellopes des notes de 'Que je t'aime', une nouvelles note chasse l'autre et évite les superpositions laides.
 
-J'ai changé en interne la logique de cette partie, pour info ce sont des sont enregistré de la synthèse qu'il y avait avant, c'est ce qui permet l'accordage...
+J'ai changé en interne la logique de cette partie, pour info ce sont des sons enregistrés de la synthèse qu'il y avait avant, c'est ce qui permet l'accordage...
 
 ### Installation:
 
