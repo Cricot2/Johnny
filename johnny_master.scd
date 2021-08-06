@@ -3,7 +3,7 @@
 
 
 /////////////////////////////////
-// Johnny V2.3: -- 05.08.2021. //
+// Johnny V2.4: -- 06.08.2021. //
 /////////////////////////////////
 
 Listen port forced to 57120.
@@ -238,51 +238,35 @@ En cliquant sur la fenetre Tune et en appuyant sur Alt + up/donw tu as un fine r
 
 				case
 
-				{ guitarNotes == 0 && synthGuitare.isPlaying.not} {
+				{ guitarNotes == 0 } {
 
-					while({synthGuitare.size > 0}, {
-						synthGuitare.[0].release(0.5);
-						synthGuitare.removeAt(0);
-					});
+					if (synthGuitare.isPlaying, {synthGuitare.release(0.5)});
 
-					synthGuitare = synthGuitare.add(Synth(
-						\player_tuned, [\buf, sounds[5], \gate, 1, \rate, fineTune]).register);
+					synthGuitare = Synth(\player_tuned, [\buf, sounds[5], \gate, 1, \rate, fineTune]).register;
 					guitarNotes = guitarNotes + 1;
 				}
 
 				{ guitarNotes == 1 } {
 
-					while({synthGuitare.size > 0}, {
-						synthGuitare.[0].release(0.5);
-						synthGuitare.removeAt(0);
-					});
+					if (synthGuitare.isPlaying, {synthGuitare.release(0.5)});
 
-					synthGuitare = synthGuitare.add(Synth(
-						\player_tuned, [\buf, sounds[5], \gate, 1, \rate, fineTune]).register);
+					synthGuitare = Synth(\player_tuned, [\buf, sounds[5], \gate, 1, \rate, fineTune]).register;
 					guitarNotes = guitarNotes + 1;
 				}
 
 				{ guitarNotes == 2 } {
 
-					while({synthGuitare.size > 0}, {
-						synthGuitare.[0].release(0.5);
-						synthGuitare.removeAt(0);
-					});
+					if (synthGuitare.isPlaying, {synthGuitare.release(0.5)});
 
-					synthGuitare = synthGuitare.add(Synth(
-						\player_tuned, [\buf, sounds[6], \gate, 1, \rate, fineTune]).register);
+					synthGuitare = Synth(\player_tuned, [\buf, sounds[6], \gate, 1, \rate, fineTune]).register;
 					guitarNotes = guitarNotes + 1;
 				}
 
 				{ guitarNotes == 3 } {
 
-					while({synthGuitare.size > 0}, {
-						synthGuitare.[0].release(0.5);
-						synthGuitare.removeAt(0);
-					});
+					if (synthGuitare.isPlaying, {synthGuitare.release(0.5)});
 
-					synthGuitare = synthGuitare.add(Synth(
-						\player_tuned, [\buf, sounds[7], \gate, 1, \rate, fineTune]).register);
+					synthGuitare = Synth(\player_tuned, [\buf, sounds[7], \gate, 1, \rate, fineTune]).register;
 					guitarNotes = 0;
 				}
 
@@ -290,7 +274,6 @@ En cliquant sur la fenetre Tune et en appuyant sur Alt + up/donw tu as un fine r
 
 		}, "/stringUp"
 		);
-
 
 		OSCdef(\guitare_feedback_switch, { |msg|
 			var synth;
