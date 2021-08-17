@@ -3,7 +3,7 @@
 
 
 /////////////////////////////////
-// Johnny V2.4: -- 06.08.2021. //
+// Johnny V2.5: -- 17.08.2021. //
 /////////////////////////////////
 
 Listen port forced to 57120.
@@ -24,15 +24,15 @@ En cliquant sur la fenetre Tune et en appuyant sur Alt + up/donw tu as un fine r
 
 	s.waitForBoot{
 
-		//Globals variables.
+		//------------------------ Global script variables && init --------------------//
+
 		var switch, fadeTime, hero, feedEnd, seq, seq2, moto, moto2,
 		sounds, guitare_seqDown, guitare_seqUp, relative_path, cater,
 		osculator_path, qlab_path, folder, osc_out, btn_clbck, sampler_sounds, sampler_sounds_loop;
 
 		var guitarNotes, synthGuitare, guit, fineTune;
-		var tunWindow, potTune;
+		var tunWindow, potTune, panicWindow, panicButton;
 
-		//Control Bus.
 		var pitch = Bus.control(s, 1);
 		var accel = Bus.control(s, 1);
 		var whammy = Bus.control(s, 1);
@@ -59,14 +59,16 @@ En cliquant sur la fenetre Tune et en appuyant sur Alt + up/donw tu as un fine r
 			osc_out = NetAddr("127.0.0.1", 8000);
 		}.value;
 
-		// GUI General.
-		var wind = Window.closeAll;
-		var volume = s.volume.gui.window.alwaysOnTop_(true);
-		s.meter.window.alwaysOnTop_(true);
+		//------------------------------ GUI General -----------------------------------//
 
-		// GUI tune pot.
-		tunWindow = Window("Tune", Rect(1234, 200, 150, 150), resizable: false)
-		.front.alwaysOnTop_(true);
+		var wind = Window.closeAll;
+		var volume = s.volume.gui;
+		s.meter;
+
+		//----------------------------- GUI Tune Pot -----------------------------------//
+
+		tunWindow = Window("Tune", Rect(1325, 200, 150, 150), resizable: false)
+		.front;
 
 		potTune = Knob(tunWindow, Rect(15, 10, 120, 120))
 		.value_(0.5)
@@ -79,10 +81,31 @@ En cliquant sur la fenetre Tune et en appuyant sur Alt + up/donw tu as un fine r
 			fineTune = tune;
 		});
 
-		// Init the fine tune for guitare_melodieUp.
-		fineTune = 1;
+		//---------------------------- GUI Panic Button -------------------------------//
 
-		//Initialise root folder directorie for soundfiles and open apps.
+		panicWindow = Window("PANIC!!", Rect(1500, 50, 300, 300))
+		.front.alpha_(0.89);
+
+		panicButton = Button(panicWindow, Rect(0, 0, 300, 300))
+		.states_([
+			["!", Color.black, Color.red],
+			["!", Color.black, Color.red]
+		]);
+
+		panicButton.font_(Font(size: 120));
+
+		panicButton.action_({ |view|
+			if (view.value == 1, {
+				s.defaultGroup.set(\gate, 0, \fadeTime, 0.05);
+			});
+		});
+
+		//////////////////// Init the fine tune for guitare_melodieUp. //////////////////
+		fineTune = 1;
+		/////////////////////////////////////////////////////////////////////////////////
+
+		//--------------------------------- Init Script -------------------------------//
+
 		sounds = Array.new;
 		relative_path = "".resolveRelative;
 
@@ -105,7 +128,8 @@ En cliquant sur la fenetre Tune et en appuyant sur Alt + up/donw tu as un fine r
 			}).play;
 		};
 
-		// SynthDefs.
+		//--------------------------------- SynthDefs -------------------------------//
+
 		SynthDef(\player_tuned, { |pan=0, amp=0.5, buf, rate=1, loop=0, gate=0, rel=1|
 			var sig, mix, env;
 			env = EnvGen.kr(Env.asr(0.01, 1, rel), gate, doneAction:2);
@@ -196,13 +220,15 @@ En cliquant sur la fenetre Tune et en appuyant sur Alt + up/donw tu as un fine r
 
 		s.sync;
 
-		//init.
+		//init after synthdefs.
 		switch = 0;
 		hero.fadeTime = 5;
 		seq = Pseq(#[48, 52, 40], inf).asStream; // ICI NOTES Guitare DOWN.
 
 		guitarNotes = 0;
 		synthGuitare = [];
+
+		//--------------------------------- ODC Controls -------------------------------//
 
 		OSCdef(\guitare_melodieDown, { |msg|
 			if (msg[1] == 1, {
