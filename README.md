@@ -14,7 +14,13 @@ http://supercollider.github.io/sc3-plugins/
 
 ### (17 aout 2021):
 
-Les fentres sont  déplaçablent dans une autre fenetre, comme ça tu peux t'arranger à ta sauce genre mettre le panic boutton à côté de Qlab...
+Le boutton panic ne fonctionne pas avec tout les envois e.g. Optique 2000 car certains sont protégé contre les appuis intempestifs (anti rebond). Mais ce ne sont que des sons courts. Le feedback et tout le reste fonctionne...
+
+
+
+Les fentêres sont  déplaçables dans une autre fenêtre, comme ça tu peux t'arranger à ta sauce genre mettre le panic boutton à côté de Qlab... Mais elle ne restent plus au premier plan.
+
+
 
 J'ai amélioré que je t'aime tu n'aura plus de message d'erreur...
 
